@@ -133,3 +133,4 @@ dmypy.json
 *.otf
 
 .pa_fonts.json
+.idea
