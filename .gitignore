@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Fonts
+*.ttf
+*.otf
+
+pa_fonts.json
