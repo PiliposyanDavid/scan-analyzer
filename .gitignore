@@ -132,4 +132,4 @@ dmypy.json
 *.ttf
 *.otf
 
-pa_fonts.json
+.pa_fonts.json
