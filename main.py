@@ -1,24 +1,18 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
-from services.analyzer_service import main, load_fonts
+from services.analyzer_service import main
 
 import os
 
 app = Flask(__name__)
 
 
-if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000)
-
-
 # load_fonts()
 
-
 @app.route('/', methods=['GET'])
-def first():
-    return {
-        'status': 'success'
-    }
+def initial():
+    return render_template('index.html')
+
 
 @app.route('/api/health-check', methods=['GET'])
 def health_check():
@@ -41,3 +35,6 @@ def upload_font():
 
     return response
 
+
+if __name__ == "__main__":
+    app.run()
