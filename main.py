@@ -14,8 +14,10 @@ app = Flask(__name__)
 #     return response
 
 
-@app.route('/', methods=['GET'])
+@app.route('/run', methods=['GET'])
 def initial():
+    print("run")
+    load_fonts()
     return render_template('index.html')
 
 
@@ -44,4 +46,3 @@ def upload_font():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    load_fonts()
