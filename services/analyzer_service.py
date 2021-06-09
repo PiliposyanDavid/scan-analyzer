@@ -3,6 +3,7 @@ import json
 from PIL import ImageFont, ImageDraw, Image
 from tqdm import tqdm
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
@@ -99,6 +100,7 @@ def load_fonts():
     with open(pa_fonts_json, 'wb') as fd:
         for chunk in response.iter_content(100):
             fd.write(chunk)
+    print("pa_fonts.json created!")
 
     with open(pa_fonts_json) as f:
         pa_fonts = json.load(f)['response']
@@ -112,6 +114,7 @@ def load_fonts():
         r = requests.get(url)
         with open(pa_fonts_dir + '/' + get_file_name_from_url(url), 'wb') as f:
             f.write(r.content)
+        print("Downloaded - " + url)
     print("Finish downloading !!")
 
 

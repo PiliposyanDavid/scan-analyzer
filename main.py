@@ -6,8 +6,6 @@ import os
 
 app = Flask(__name__)
 
-load_fonts()
-
 
 # @app.errorhandler(InvalidUsage)
 # def handle_invalid_usage(error):
@@ -46,3 +44,4 @@ def upload_font():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+    load_fonts()
