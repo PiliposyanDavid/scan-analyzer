@@ -14,11 +14,16 @@ app = Flask(__name__)
 #     return response
 
 
-@app.route('/run', methods=['GET'])
+@app.route('/', methods=['GET'])
 def initial():
+    return render_template('index.html')
+
+
+@app.route('/run', methods=['GET'])
+def run():
     print("run")
     load_fonts()
-    return render_template('index.html')
+    return {"status": "loaded"}
 
 
 @app.route('/api/health-check', methods=['GET'])
