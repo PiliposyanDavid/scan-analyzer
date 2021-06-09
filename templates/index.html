@@ -5,74 +5,74 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Form </title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <style>
-      @charset "UTF-8";
-:root {
-  --black: #393838;
-  --red: #f2214b;
-  --green: #41f290;
-  --pink: #fcf4f6;
-  --easing-cubic-bezier: cubic-bezier(0.04, 2.37, 0.25, 1);
-  --box-shadow: 0 0 12px rgba(0,0,0,0.4);
-}
+    <style>
+        @charset "UTF-8";
+        :root {
+            --black: #393838;
+            --red: #f2214b;
+            --green: #41f290;
+            --pink: #fcf4f6;
+            --easing-cubic-bezier: cubic-bezier(0.04, 2.37, 0.25, 1);
+            --box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+        }
 
-body {
-  background-image: linear-gradient(to top right, rgba(0, 0, 0, 0) 0%, rgba(95, 158, 160, 0.9) 80%), linear-gradient(to bottom right, salmon, #3676e8);
-  min-height: 100vh;
-  min-width: 100vw;
-  overflow: auto;
-  font-family: "Lato", sans-serif;
-  color: var(--black);
-  padding: 1rem;
-}
+        body {
+            background-image: linear-gradient(to top right, rgba(0, 0, 0, 0) 0%, rgba(95, 158, 160, 0.9) 80%), linear-gradient(to bottom right, salmon, #3676e8);
+            min-height: 100vh;
+            min-width: 100vw;
+            overflow: auto;
+            font-family: "Lato", sans-serif;
+            color: var(--black);
+            padding: 1rem;
+        }
 
-.file-upload-form {
-  max-width: 600px;
-  margin: 0 auto;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
+        .file-upload-form {
+            max-width: 600px;
+            margin: 0 auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
-.file-upload {
-  background: white;
-  box-shadow: var(--box-shadow);
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  align-items: center;
-}
-
-
-[type=submit] {
-  display: block;
-  background: #3676e8;
-  color: white;
-  appearance: none;
-  width: 100%;
-  border: 0;
-  padding: 1rem;
-  font-size: 1.4rem;
-}
+        .file-upload {
+            background: white;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            align-items: center;
+        }
 
 
-  </style>
-   
+        [type=submit] {
+            display: block;
+            background: #3676e8;
+            color: white;
+            appearance: none;
+            width: 100%;
+            border: 0;
+            padding: 1rem;
+            font-size: 1.4rem;
+        }
+
+
+    </style>
+
 </head>
 <body>
-    
-        <form action="" class="file-upload-form">
-          <div class="file-upload">
-            <label>Select one  font's file to upload.</label>
-            <input type="file" name="attachedfile" accept=".ttf,.otf">
-           
-          </div>
-           
-          <input type="submit" value="Submit">
-        </form>
-    
+
+<form action="http://127.0.0.1:5000/api/font/upload" method="post" class="file-upload-form" enctype="multipart/form-data">
+    <div class="file-upload">
+        <label>Select one font's file to upload.</label>
+        <input type="file" name="file" accept=".ttf,.otf">
+
+    </div>
+
+    <input type="submit" value="Submit">
+</form>
+
 </body>
 
 </html>

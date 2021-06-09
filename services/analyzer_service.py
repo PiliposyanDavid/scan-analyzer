@@ -93,7 +93,7 @@ def load_fonts():
         os.mkdir(pa_fonts_dir)
 
     response = requests.get(
-        'https://api.picsart.com/stage-versions/tmp-branch-test/api/shop/fonts/items')
+        'https://api.picsart.com/shop/fonts/items')
     with open(pa_fonts_json, 'wb') as fd:
         for chunk in response.iter_content(100):
             fd.write(chunk)
@@ -118,16 +118,16 @@ def get_file_name_from_url(url):
 
 
 def main(image_file_or_font, pa_fonts_json='pa_fonts.json', pa_fonts_dir='pa_fonts', text='ABCQabilqpvw', font_size=16,
-         best_matches=5, output='public/result.html'):
-    font_file_map = load_listing(pa_fonts_json, pa_fonts_dir)
+         best_matches=5):
     result = ''
+    font_file_map = load_listing(pa_fonts_json, pa_fonts_dir)
     for i, (name, img) in enumerate(
             find_font(image_file_or_font, font_file_map, text, font_size, best_matches)):
         result += f"""
-                        <div>
-                          <p>{i + 1}) {name}</p>
-                          <img src="data:image/png;base64,{img}" alt="Data of {name}" />
-                        </div>
-                        
-                        """
+                            <div>
+                              <p>{i + 1}) {name}</p>
+                              <img src="data:image/png;base64,{img}" alt="Data of {name}" />
+                            </div>
+                            
+                            """
     return result

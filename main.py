@@ -1,13 +1,22 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
-from services.analyzer_service import main
+from services.analyzer_service import main, load_fonts
 
 import os
+import glob
+
 
 app = Flask(__name__)
 
 
 # load_fonts()
+
+# @app.errorhandler(InvalidUsage)
+# def handle_invalid_usage(error):
+#     response = jsonify(error.to_dict())
+#     response.status_code = error.status_code
+#     return response
+
 
 @app.route('/', methods=['GET'])
 def initial():
@@ -23,10 +32,11 @@ def health_check():
 
 @app.route('/api/font/upload', methods=['POST'])
 def upload_font():
+    print("111")
     if not os.path.exists('uploads'):
         os.mkdir('uploads')
 
-    f = request.files['the_file']
+    f = request.files['file']
     file_path = 'uploads/' + secure_filename(f.filename)
     f.save(file_path)
 

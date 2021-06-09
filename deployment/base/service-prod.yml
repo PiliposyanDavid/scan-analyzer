@@ -1,0 +1,536 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api
+  labels:
+    run: pa-api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api2
+  labels:
+    run: pa-api2
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api3
+  labels:
+    run: pa-api3
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api4
+  labels:
+    run: pa-api4
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api5
+  labels:
+    run: pa-api5
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api6
+  labels:
+    run: pa-api6
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api7
+  labels:
+    run: pa-api7
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api8
+  labels:
+    run: pa-api8
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api9
+  labels:
+    run: pa-api9
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api10
+  labels:
+    run: pa-api10
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+
+
+
+
+
+
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api11
+  labels:
+    run: pa-api11
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api12
+  labels:
+    run: pa-api12
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api13
+  labels:
+    run: pa-api13
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api14
+  labels:
+    run: pa-api14
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api15
+  labels:
+    run: pa-api15
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api16
+  labels:
+    run: pa-api16
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api17
+  labels:
+    run: pa-api17
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api18
+  labels:
+    run: pa-api18
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api19
+  labels:
+    run: pa-api19
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api20
+  labels:
+    run: pa-api20
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pa-api
+  name: pa-api21
+  labels:
+    run: pa-api21
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: api
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: contacts
+  #  - port: 25
+  #    protocol: TCP
+  #    targetPort: 25
+  #    name: smtp
+  selector:
+    app: pa-api
+

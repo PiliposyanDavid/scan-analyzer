@@ -1,0 +1,851 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pa-api
+  namespace: pa-api
+  labels:
+    tags.datadoghq.com/env: "prod"
+    tags.datadoghq.com/service: "pa-api"
+    tags.datadoghq.com/version: "3.0.0"
+#  annotations:
+#    wave.pusher.com/update-on-config-change: "true"
+spec:
+  selector:
+    matchLabels:
+      app: pa-api
+  # Full threads=1168
+  replicas: 42
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 10%
+      maxSurge: 10%
+  template:
+    metadata:
+      annotations:
+        for-restart-purposes: "2020/02/21/10:15:37"
+      labels:
+        app: pa-api
+        tags.datadoghq.com/env: "prod"
+        tags.datadoghq.com/service: "pa-api"
+        tags.datadoghq.com/version: "3.0.0"
+    spec:
+      #hostNetwork: true
+      #dnsPolicy: ClusterFirstWithHostNet
+      #terminationGracePeriodSeconds: 0
+
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - preference:
+              matchExpressions:
+              - key: pa-api-preferred
+                operator: In
+                values:
+                - "true"
+            weight: 10
+
+          requiredDuringSchedulingIgnoredDuringExecution:
+            #requiredDuringSchedulingRequiredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "pa-api"
+                    operator: In
+                    values:
+                      - "true"
+
+        #podAntiAffinity:
+        #  requiredDuringSchedulingIgnoredDuringExecution:
+        #  - labelSelector:
+        #      matchExpressions:
+        #      - key: app
+        #        operator: In
+        #        values:
+        #        - pa-api
+        #    topologyKey: "kubernetes.io/hostname"
+
+
+      containers:
+        - name: pa-api
+          image: gcr.io/picsartgc/backend/production/pa-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001
+              name: api
+            - containerPort: 3005
+              name: contacts
+          resources:
+            requests:
+              cpu: "14000m"
+              memory: "25600Mi"
+
+          volumeMounts:
+            - name: gc-storage-admin
+              mountPath: /var/www/storage_admin.json
+              subPath: storage_admin.json
+
+#          readinessProbe:
+#            httpGet: # make an HTTP request
+#              port: 3001 # port to use
+#              path: /healthcheck # endpoint to hit
+#              scheme: HTTP # or HTTPS
+#            initialDelaySeconds: 120 # how long to wait before checking
+#            periodSeconds: 10 # how long to wait between checks
+#            successThreshold: 1 # how many successes to hit before accepting
+#            failureThreshold: 1 # how many failures to accept before failing
+#            timeoutSeconds: 1 # how long to wait for a response
+
+          livenessProbe:
+            httpGet: # make an HTTP request
+              port: 3001 # port to use
+              path: /healthcheck # endpoint to hit
+              scheme: HTTP # or HTTPS
+            initialDelaySeconds: 300 # how long to wait before checking
+            periodSeconds: 30 # how long to wait between checks
+            successThreshold: 1 # how many successes to hit before accepting
+            failureThreshold: 5 # how many failures to accept before failing
+            timeoutSeconds: 2 # how long to wait for a response
+          readinessProbe: # readiness is set, so startup works correctly (issue in k8s)
+            httpGet: # make an HTTP request
+              port: 3001 # port to use
+              path: /healthcheck # endpoint to hit
+              scheme: HTTP # or HTTPS
+            initialDelaySeconds: 3
+            periodSeconds: 5 # how long to wait between checks
+            successThreshold: 1 # how many successes to hit before accepting
+            failureThreshold: 10 # how many failures to accept before failing
+            timeoutSeconds: 1 # how long to wait for a response
+          startupProbe:
+            httpGet: # make an HTTP request
+              port: 3001 # port to use
+              path: /startup # endpoint to hit
+              scheme: HTTP # or HTTPS
+            periodSeconds: 1 # how long to wait between checks
+            failureThreshold: 20 # how many failures to accept before failing
+            timeoutSeconds: 1 # how long to wait for a response
+          env:
+            - name: WORKERS_COUNT
+              value: '16'
+#            - name: DD_TRACE_ANALYTICS_ENABLED
+#              value: "true"
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_METRICS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: DD_AGENT_HOST
+                  name: pa-api-services
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+            - name: AESTHETIC_IMAGES
+              value: 'false'
+            - name: BRITEVERIFY_BASE_URL
+              value: 'https://bpi.briteverify.com/'
+            - name: AESTHETIC_IMAGES_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: AESTHETIC_IMAGES_URL
+                  name: pa-api-services
+            - name: AI_RELATED_KEYWORDS_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  key: AI_RELATED_KEYWORDS_SERVICE
+                  name: pa-api-services
+            - name: AI_KEYWORDS_SERVICE_URL
+              value: 'https://aiub.picsart.com/api/v1'
+            - name: APPLE_STORE_SANDBOX_URL
+              value: 'https://sandbox.itunes.apple.com/verifyReceipt'
+            - name: APPLE_STORE_URL
+              value: 'https://buy.itunes.apple.com/verifyReceipt'
+            - name: APPSFLYER_STATE_ANDROID
+              value: 'ENABLED'
+            - name: APPSFLYER_STATE_APPLE
+              value: 'ENABLED'
+            - name: AUTH_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  key: AUTH_SERVICE
+                  name: pa-api-services
+            - name: CHINA_SUBSCRIPTION_SEGMENT
+              value: 'AND >= 10.7-CHINA'
+            - name: FEATURE_EXTRACTOR
+              value: 'true'
+            - name: PA_ENV
+              value: 'production'
+            - name: FEATURE_EXTRACTOR_URL_V2
+              valueFrom:
+                configMapKeyRef:
+                  key: FEATURE_EXTRACTOR_URL_V2
+                  name: pa-api-services
+            - name: FOURSQUARE
+              value: 'true'
+            - name: GID
+              valueFrom:
+                configMapKeyRef:
+                  key: GID
+                  name: pa-api-services
+            - name: GOOGLE_CLOUD_DOMAIN_BUCKET_MAPPING
+              value: '{"cdn130":"picsartcdn13", "cdn140":"picsartcdn14", "hcdn" : "picsart-editor-history", "hcdn2" : "picsart-editor-history-nonuploaded"}'
+            - name: GOOGLE_CLOUD_KEY_PATH
+              value: '/var/www/storage_admin.json'
+            - name: GRAPHITE
+              value: 'true'
+            - name: GRAPHITE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: GRAPHITE_HOST
+                  name: pa-api-services
+            - name: GRAPHITE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: GRAPHITE_PORT
+                  name: pa-api-services
+            - name: LIFTIGNITER_RECOMMENDATION_ENABLED
+              value: 'false'
+            - name: LIFTIGNITER_REGISTRATION_ENABLED
+              value: 'false'
+            - name: MATURE_SERVER
+              value: 'true'
+            - name: MATURE_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: MATURE_SERVER_URL
+                  name: pa-api-services
+            - name: MESSAGING_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: MESSAGING_URL
+                  name: pa-api-services
+            - name: MF_FEATURED_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: MF_FEATURED_HOST
+                  name: pa-api-services
+            - name: MF_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: MF_HOST
+                  name: pa-api-services
+            - name: MODERATOR_BOT
+              value: 'true'
+            - name: MONGO_COLLECTIONS_CONNECTION_STRING
+              valueFrom:
+                configMapKeyRef:
+                  key: MONGO_COLLECTIONS_CONNECTION_STRING
+                  name: pa-api-db
+            - name: MONGO_DBEDITOR_CON_STRING
+              valueFrom:
+                configMapKeyRef:
+                  key: MONGO_DBEDITOR_CON_STRING
+                  name: pa-api-db
+            - name: MONGO_NOTIFICATIONS_CON_STRING
+              valueFrom:
+                configMapKeyRef:
+                  key: MONGO_NOTIFICATIONS_CON_STRING
+                  name: pa-api-db
+            - name: MONGO_READ
+              valueFrom:
+                configMapKeyRef:
+                  key: MONGO_READ
+                  name: pa-api-db
+            - name: MS_VISION_ENABLED
+              value: "true"
+            - name: NODE_ENV
+              value: 'production'
+            - name: PHOTO_CLUSTERING
+              value: 'true'
+            - name: REDIS_DATA_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_DATA_HOST
+                  name: pa-api-db
+            - name: REDIS_DATA_REPLICAS
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_DATA_REPLICAS
+                  name: pa-api-db
+                  optional: true
+            - name: REDIS_DATA_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_DATA_PORT
+                  name: pa-api-db
+            - name: REDIS_HASHTAGS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_HASHTAGS_HOST
+                  name: pa-api-db
+            - name: REDIS_HASHTAGS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_HASHTAGS_PORT
+                  name: pa-api-db
+            - name: REDIS_DATA2_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_DATA2_HOST
+                  name: pa-api-db
+            - name: REDIS_DATA2_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_DATA2_PORT
+                  name: pa-api-db
+            - name: REDIS_DATA3_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_DATA3_HOST
+                  name: pa-api-db
+            - name: REDIS_DATA3_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_DATA3_PORT
+                  name: pa-api-db
+            - name: REDIS_HISTORY_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_HISTORY_HOST
+                  name: pa-api-db
+            - name: REDIS_HISTORY_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_HISTORY_PORT
+                  name: pa-api-db
+            - name: REDIS_LISTS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_LISTS_HOST
+                  name: pa-api-db
+            - name: REDIS_LISTS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_LISTS_PORT
+                  name: pa-api-db
+            - name: REDIS_LISTS1_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_LISTS1_HOST
+                  name: pa-api-db
+            - name: REDIS_LISTS1_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_LISTS1_PORT
+                  name: pa-api-db
+            - name: REDIS_MEDIAS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_MEDIAS_HOST
+                  name: pa-api-db
+            - name: REDIS_MEDIAS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_MEDIAS_PORT
+                  name: pa-api-db
+            - name: REDIS_NETWORK_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NETWORK_HOST
+                  name: pa-api-db
+            - name: REDIS_NETWORK_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NETWORK_PORT
+                  name: pa-api-db
+            - name: REDIS_NETWORK2_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NETWORK2_HOST
+                  name: pa-api-db
+            - name: REDIS_NETWORK2_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NETWORK2_PORT
+                  name: pa-api-db
+            - name: REDIS_NETWORK_STICKERS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NETWORK_STICKERS_HOST
+                  name: pa-api-db
+            - name: REDIS_NETWORK_STICKERS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NETWORK_STICKERS_PORT
+                  name: pa-api-db
+            - name: REDIS_NOTIFICATIONS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NOTIFICATIONS_HOST
+                  name: pa-api-db
+            - name: REDIS_NOTIFICATIONS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NOTIFICATIONS_PORT
+                  name: pa-api-db
+            - name: REDIS_PHOTOS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_PHOTOS_HOST
+                  name: pa-api-db
+            - name: REDIS_PHOTOS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_PHOTOS_PORT
+                  name: pa-api-db
+            - name: REDIS_PHOTOS2_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_PHOTOS2_HOST
+                  name: pa-api-db
+            - name: REDIS_PUBSUB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_PUBSUB_HOST
+                  name: pa-api-db
+            - name: REDIS_PUBSUB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_PUBSUB_PORT
+                  name: pa-api-db
+            - name: REDIS_RECOMMENDATIONS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_RECOMMENDATIONS_HOST
+                  name: pa-api-db
+            - name: REDIS_RECOMMENDATIONS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_RECOMMENDATIONS_PORT
+                  name: pa-api-db
+            - name: REDIS_SESSIONS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_SESSIONS_HOST
+                  name: pa-api-db
+            - name: REDIS_SESSIONS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_SESSIONS_PORT
+                  name: pa-api-db
+            - name: REDIS_STREAMS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_STREAMS_HOST
+                  name: pa-api-db
+            - name: REDIS_STREAMS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_STREAMS_PORT
+                  name: pa-api-db
+            - name: REDIS_TAG_PHOTOS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_TAG_PHOTOS_HOST
+                  name: pa-api-db
+            - name: REDIS_TAG_PHOTOS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_TAG_PHOTOS_PORT
+                  name: pa-api-db
+            - name: REDIS_USER_PHOTOS_LISTS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USER_PHOTOS_LISTS_HOST
+                  name: pa-api-db
+            - name: REDIS_USER_PHOTOS_LISTS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USER_PHOTOS_LISTS_PORT
+                  name: pa-api-db
+            - name: REDIS_USERS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USERS_HOST
+                  name: pa-api-db
+            - name: REDIS_USER_REPLICAS
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USER_REPLICAS
+                  name: pa-api-db
+                  optional: true
+            - name: REDIS_USERS_LIGHT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USERS_LIGHT_HOST
+                  name: pa-api-db
+            - name: REDIS_USERS_LIGHT_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USERS_LIGHT_PORT
+                  name: pa-api-db
+            - name: REDIS_USERS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USERS_PORT
+                  name: pa-api-db
+            - name: REDIS_USERS2_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USERS2_HOST
+                  name: pa-api-db
+            - name: REDIS_USERS2_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_USERS2_PORT
+                  name: pa-api-db
+            - name: REDIS_TRANSLATIONS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_TRANSLATIONS_HOST
+                  name: pa-api-db
+            - name: REDIS_TRANSLATIONS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_TRANSLATIONS_PORT
+                  name: pa-api-db
+            - name: REDIS_RATE_LIMITS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_RATE_LIMITS_HOST
+                  name: pa-api-db
+            - name: REDIS_RATE_LIMITS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_RATE_LIMITS_PORT
+                  name: pa-api-db
+            - name: REDIS_VIEW_COUNTS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_VIEW_COUNTS_HOST
+                  name: pa-api-db
+            - name: REDIS_VIEW_COUNTS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_VIEW_COUNTS_PORT
+                  name: pa-api-db
+            - name: REDIS_LOCAL_SAVE_COUNTS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_LOCAL_SAVE_COUNTS_PORT
+                  name: pa-api-db
+            - name: REDIS_LOCAL_SAVE_COUNTS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_LOCAL_SAVE_COUNTS_HOST
+                  name: pa-api-db
+            - name: REDIS_NETWORK_VIEWS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NETWORK_VIEWS_HOST
+                  name: pa-api-db
+            - name: REDIS_NETWORK_VIEWS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_NETWORK_VIEWS_PORT
+                  name: pa-api-db
+            - name: REDIS_EDITOR_CHOOSER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_EDITOR_CHOOSER_HOST
+                  name: pa-api-db
+            - name: REDIS_EDITOR_CHOOSER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_EDITOR_CHOOSER_PORT
+                  name: pa-api-db
+            - name: SEGMENTATION_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  key: SEGMENTATION_SERVICE
+                  name: pa-api-services
+            - name: AI_UB_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  key: AI_UB_SERVICE
+                  name: pa-api-services
+            - name: SIMILAR_SERVER
+              value: 'true'
+            - name: SIMILAR_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: SIMILAR_SERVER_URL
+                  name: pa-api-services
+            - name: SMTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: SMTP_HOST
+                  name: pa-api-services
+            - name: SMTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: SMTP_PORT
+                  name: pa-api-services
+            - name: SOLR1
+              valueFrom:
+                configMapKeyRef:
+                  key: SOLR1
+                  name: pa-api-services
+            - name: SOLR2
+              valueFrom:
+                configMapKeyRef:
+                  key: SOLR2
+                  name: pa-api-services
+            - name: SOLR_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  key: SOLR_HOSTS
+                  name: pa-api-services
+                  optional: true
+            - name: UPSCALE_SERVER
+              value: 'true'
+            - name: UPSCALE_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: UPSCALE_SERVER_URL
+                  name: pa-api-services
+            - name: WECHAT_DEDUCTION_URL
+              value: 'https://api.picsart.com/shop/subscription/deduction/china'
+            - name: PICSART_TOOLS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: PICSART_TOOLS_HOST
+                  name: pa-api-services
+
+            ##########################################  secrets ################################################
+            - name: ETHYCA_AUTH_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: ETHYCA_AUTH_KEY
+                  name: pa-api
+            - name: MONGO_APOLLO_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  key: MONGO_APOLLO_CONNECTION_STRING
+                  name: pa-api
+            - name: MONGO1_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  key: MONGO1_CONNECTION_STRING
+                  name: pa-api
+            - name: MONGO_EDITOR_PROJECTS_CON_STRING
+              valueFrom:
+                secretKeyRef:
+                  key: MONGO_EDITOR_PROJECTS_CON_STRING
+                  name: pa-api
+            - name: MONGO2_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  key: MONGO2_CONNECTION_STRING
+                  name: pa-api
+            - name: BRITEVERIFY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: BRITEVERIFY_API_KEY
+                  name: pa-api
+            - name: GOOGLE_CLOUD_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: GOOGLE_CLOUD_PROJECT_ID
+                  name: pa-api
+            - name: API_INTERNAL_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: API_INTERNAL_ACCESS_TOKEN
+                  name: pa-api
+            - name: APPBOY_GROUP_ID
+              valueFrom:
+                secretKeyRef:
+                  key: APPBOY_GROUP_ID
+                  name: pa-api
+            - name: APPLE_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: APPLE_STORE_PASSWORD
+                  name: pa-api
+            - name: BING_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: BING_KEY
+                  name: pa-api
+            - name: BRANCH_IO_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: BRANCH_IO_KEY
+                  name: pa-api
+            - name: CLARIFAI_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: CLARIFAI_CLIENT_ID
+                  name: pa-api
+            - name: CLARIFAI_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: CLARIFAI_CLIENT_SECRET
+                  name: pa-api
+            - name: FOURSQUARE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: FOURSQUARE_CLIENT_ID
+                  name: pa-api
+            - name: FOURSQUARE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: FOURSQUARE_CLIENT_SECRET
+                  name: pa-api
+            - name: GIPHY_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: GIPHY_ACCESS_KEY
+                  name: pa-api
+            - name: GOOGLE_PLAY_STORE_CLIENT_EMAIL
+              value: "1076413845392@developer.gserviceaccount.com"
+            - name: GOOGLE_PURCHASE_VERIFICATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: GOOGLE_PURCHASE_VERIFICATION_KEY
+                  name: pa-api
+            - name: INTERNAL_AUTH_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: INTERNAL_AUTH_KEY
+                  name: pa-api
+            - name: INTERNAL_AI_RELATED_HASHTAGS_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: INTERNAL_AI_RELATED_HASHTAGS_BEARER_TOKEN
+                  name: pa-api
+            - name: LIFTIGNITER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: LIFTIGNITER_API_KEY
+                  name: pa-api
+            - name: MONGO_HADES_CON_STRING
+              valueFrom:
+                secretKeyRef:
+                  key: MONGO_HADES_CON_STRING
+                  name: pa-api
+            - name: MS_VISION_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: MS_VISION_KEY
+                  name: pa-api
+            - name: STRIPE_CLIENT_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: STRIPE_CLIENT_PUBLIC_KEY
+                  name: pa-api
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: STRIPE_SECRET_KEY
+                  name: pa-api
+            - name: STRIPE_WEBHOOK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: STRIPE_WEBHOOK_SECRET_KEY
+                  name: pa-api
+            - name: UNSPLASH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: UNSPLASH_CLIENT_ID
+                  name: pa-api
+            - name: UNSPLASH_CLIENT_ID_AND
+              valueFrom:
+                secretKeyRef:
+                  key: UNSPLASH_CLIENT_ID_AND
+                  name: pa-api
+            - name: UNSPLASH_CLIENT_ID_IOS
+              valueFrom:
+                secretKeyRef:
+                  key: UNSPLASH_CLIENT_ID_IOS
+                  name: pa-api
+            - name: UNSPLASH_CLIENT_ID_WEB
+              valueFrom:
+                secretKeyRef:
+                  key: UNSPLASH_CLIENT_ID_WEB
+                  name: pa-api
+            - name: contacts_iv
+              valueFrom:
+                secretKeyRef:
+                  key: contacts_iv
+                  name: pa-api
+            - name: contacts_key
+              valueFrom:
+                secretKeyRef:
+                  key: contacts_key
+                  name: pa-api
+            - name: SHUTTERSTOCK_SUBSCRIPTION_ID_GOLD_USERS
+              valueFrom:
+                secretKeyRef:
+                  key: SUBSCRIPTION_ID_GOLD_USERS
+                  name : pa-api
+            - name: SHUTTERSTOCK_TOKEN_GOLD_USERS
+              valueFrom:
+                secretKeyRef:
+                  key: SHUTTERSTOCK_TOKEN_GOLD_USERS
+                  name: pa-api
+            - name: FEATURE_EXTRACTOR_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: FEATURE_EXTRACTOR_TOKEN
+                  name: pa-api
+            - name: AI_CALLBACK_AUTH_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: AI_CALLBACK_AUTH_KEY
+                  name: pa-api
+            - name: SHUTTERSTOCK_TOKEN_STARTER_USERS
+              valueFrom:
+                  secretKeyRef:
+                    key: SHUTTERSTOCK_TOKEN_STARTER_USERS
+                    name: pa-api
+            - name: SHUTTERSTOCK_SUBSCRIPTION_ID_STARTER_USERS
+              valueFrom:
+                  secretKeyRef:
+                    key: SHUTTERSTOCK_SUBSCRIPTION_ID_STARTER_USERS
+                    name: pa-api
+            - name: SHUTTERSTOCK_LICENSE_TOKEN_GOLD_USERS
+              valueFrom:
+                secretKeyRef:
+                  key: SHUTTERSTOCK_LICENSE_TOKEN_GOLD_USERS
+                  name: pa-api
+            - name: SHUTTERSTOCK_LICENSE_SUBSCRIPTION_ID_GOLD_USERS
+              valueFrom:
+                secretKeyRef:
+                  key: SHUTTERSTOCK_LICENSE_SUBSCRIPTION_ID_GOLD_USERS
+                  name: pa-api
+
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  key: SMTP_USER
+                  name: pa-api
+
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: SMTP_PASS
+                  name: pa-api
+
+            - name: AI_DAL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: AI_DAL_TOKEN
+                  name: pa-api
+
+      volumes:
+        - name: gc-storage-admin
+          secret:
+            secretName: gc-storage-admin
+
+      imagePullSecrets:
+        - name: gcr-json-key
