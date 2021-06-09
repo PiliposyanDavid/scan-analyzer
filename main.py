@@ -32,7 +32,6 @@ def health_check():
 
 @app.route('/api/font/upload', methods=['POST'])
 def upload_font():
-    print("111")
     if not os.path.exists('uploads'):
         os.mkdir('uploads')
 
@@ -47,4 +46,5 @@ def upload_font():
 
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
