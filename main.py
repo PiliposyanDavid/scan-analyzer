@@ -3,13 +3,11 @@ from werkzeug.utils import secure_filename
 from services.analyzer_service import main, load_fonts
 
 import os
-import glob
-
 
 app = Flask(__name__)
 
+load_fonts()
 
-# load_fonts()
 
 # @app.errorhandler(InvalidUsage)
 # def handle_invalid_usage(error):
