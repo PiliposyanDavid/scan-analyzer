@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
 from services.analyzer_service import main, load_fonts
-
 import os
 
 app = Flask(__name__)
