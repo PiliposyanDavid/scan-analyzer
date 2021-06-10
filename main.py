@@ -42,8 +42,9 @@ def upload_font():
 
     if not os.path.exists('pa_fonts.json'):
         print("Here")
-        # load_fonts()
-        return render_template('await.html')
+        render_template('await.html')
+        load_fonts()
+        return
 
     response = main(file_path)
     os.remove(file_path)
