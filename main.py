@@ -44,9 +44,11 @@ def upload_font():
 
     if not os.path.exists('pa_fonts.json'):
         print("Here")
-        render_template('await.html')
-        load_fonts_background()
-        return
+        download_thread = threading.Thread(target=load_fonts(), name="LoadFonts")
+        download_thread.daemon = True
+        download_thread.start()
+
+        return render_template('await.html')
 
     response = main(file_path)
     os.remove(file_path)
