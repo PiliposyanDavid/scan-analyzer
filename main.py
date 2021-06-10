@@ -2,8 +2,10 @@ from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
 from services.analyzer_service import main, load_fonts
 import os
+import threading
 
 app = Flask(__name__)
+
 
 # @app.errorhandler(InvalidUsage)
 # def handle_invalid_usage(error):
@@ -43,13 +45,18 @@ def upload_font():
     if not os.path.exists('pa_fonts.json'):
         print("Here")
         render_template('await.html')
-        load_fonts()
+        load_fonts_background()
         return
 
     response = main(file_path)
     os.remove(file_path)
 
     return response
+
+
+def load_fonts_background():
+    download_thread = threading.Thread(target=load_fonts(), name="LoadFonts")
+    download_thread.start()
 
 
 if __name__ == "__main__":
