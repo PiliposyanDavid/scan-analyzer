@@ -33,17 +33,17 @@ def health_check():
 
 @app.route('/api/font/upload', methods=['POST'])
 def upload_font():
-    if not os.path.exists('pa_fonts.json'):
-        print("Here")
-        # load_fonts()
-        return render_template('await.html')
-
     if not os.path.exists('uploads'):
         os.mkdir('uploads')
 
     f = request.files['file']
     file_path = 'uploads/' + secure_filename(f.filename)
     f.save(file_path)
+
+    if not os.path.exists('pa_fonts.json'):
+        print("Here")
+        # load_fonts()
+        return render_template('await.html')
 
     response = main(file_path)
     os.remove(file_path)
