@@ -33,6 +33,10 @@ def health_check():
 
 @app.route('/api/font/upload', methods=['POST'])
 def upload_font():
+    if not os.path.exists('pa_fonts.json'):
+        return {
+            "message": "Please call https://scan-font.herokuapp.com/api/font/upload for download fonts and scan"
+        }
     if not os.path.exists('uploads'):
         os.mkdir('uploads')
 
