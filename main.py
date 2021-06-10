@@ -5,7 +5,6 @@ import os
 import threading
 
 app = Flask(__name__)
-download_thread = None
 
 
 # @app.errorhandler(InvalidUsage)
@@ -45,22 +44,13 @@ def upload_font():
 
     if not os.path.exists('pa_fonts.json'):
         print("Here")
-        if download_thread is not None and download_thread.isAlive():
-            download_thread = threading.Thread(target=load_fonts(), name="LoadFonts")
-            download_thread.daemon = True
-            download_thread.start()
-
+        load_fonts()
         return render_template('await.html')
 
     response = main(file_path)
     os.remove(file_path)
 
     return response
-
-
-def load_fonts_background():
-    download_thread = threading.Thread(target=load_fonts(), name="LoadFonts")
-    download_thread.start()
 
 
 if __name__ == "__main__":
